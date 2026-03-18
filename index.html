@@ -5,754 +5,940 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DOSPERT — Domain-Specific Risk-Taking Scale</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --red: #990000;
-  --bg: #f7f6f2;
-  --surface: #ffffff;
-  --border: #e4e2d9;
-  --text: #1a1917;
-  --muted: #7a786f;
-  --ethical: #A32D2D;
-  --financial: #BA7517;
-  --health: #185FA5;
-  --recreational: #0F6E56;
-  --social: #534AB7;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-}
+  :root {
+    --bg:           #f5f4f2;
+    --surface:      #ffffff;
+    --surface2:     #f0efed;
+    --border:       #dddbd8;
+    --cardinal:     #990000;
+    --cardinal-dim: rgba(153,0,0,0.08);
+    --gold:         #FFCC00;
+    --gold-dark:    #b89000;
+    --green:        #2a7a4b;
+    --red:          #c0392b;
+    --text:         #1a1a1a;
+    --text-dim:     #555555;
+    --text-muted:   #888888;
+    --sans:         -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --mono:         'Courier New', Courier, monospace;
+    --radius:       8px;
+    --radius-lg:    12px;
+  }
 
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem 4rem;
-}
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-/* ── TOP BAR ── */
-.topbar {
-  width: 100%;
-  max-width: 600px;
-  margin-bottom: 1.5rem;
-}
+  /* ── Header ── */
+  .site-header {
+    width: 100%;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 3px solid var(--cardinal);
+    background: var(--surface);
+  }
+  .site-header .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cardinal);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .site-header .logo span {
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .phase-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .step-counter {
+    font-size: 12px;
+    color: var(--cardinal);
+    font-weight: 600;
+  }
 
-.topbar-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
+  /* ── Segmented progress bar ── */
+  .progress-segments {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: none;
+  }
+  .segments-track {
+    display: flex;
+    gap: 4px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .segment {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 100px;
+    transition: background 0.3s ease;
+  }
+  .segment.done   { background: var(--cardinal); }
+  .segment.active { background: var(--cardinal); opacity: 0.45; }
+  .segment-labels {
+    display: flex;
+    gap: 4px;
+    max-width: 760px;
+    margin: 4px auto 0;
+  }
+  .segment-label {
+    flex: 1;
+    font-size: 9px;
+    text-align: center;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .segment-label.active { color: var(--cardinal); }
 
-.topbar-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
+  /* ── Main wrapper ── */
+  .page-main {
+    width: 100%;
+    max-width: 760px;
+    padding: 48px 24px 80px;
+    flex: 1;
+  }
 
-.topbar-step {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-}
+  /* ── Screen management ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.3s ease; }
 
-/* Segmented progress bar */
-.seg-track {
-  display: flex;
-  gap: 4px;
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-.seg {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--border);
-  transition: background 0.3s ease;
-}
+  /* ── Welcome ── */
+  .welcome-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cardinal);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .welcome-title {
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .welcome-title em { color: var(--cardinal); font-style: normal; }
+  .welcome-description {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 32px;
+  }
 
-.seg.done { background: var(--red); }
-.seg.active { background: var(--red); opacity: 0.45; }
+  .welcome-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .welcome-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--cardinal);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .welcome-card .card-num {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--cardinal);
+    margin-bottom: 2px;
+  }
+  .welcome-card .card-label { font-size: 12px; color: var(--text-muted); }
+  .welcome-card .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 10px 0 4px; }
+  .welcome-card .card-desc  { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 
-/* Domain pip row */
-.domain-pips {
-  display: flex;
-  gap: 4px;
-  margin-top: 8px;
-}
+  .welcome-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 36px;
+  }
+  .welcome-divider::before,
+  .welcome-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.dpip {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 4px 0;
-  border-radius: 4px;
-  opacity: 0.35;
-  transition: opacity 0.2s;
-}
+  /* ── Section wrapper ── */
+  .section-header {
+    padding: 14px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-badge {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 700;
+    background: var(--cardinal-dim);
+    color: var(--cardinal);
+    border: 1px solid rgba(153,0,0,0.2);
+  }
+  .section-title   { font-size: 13px; font-weight: 600; color: var(--text); }
+  .section-subtitle { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .section-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 28px;
+  }
 
-.dpip.done, .dpip.active { opacity: 1; }
+  /* ── Item rows ── */
+  .question { margin-bottom: 24px; }
+  .question:last-of-type { margin-bottom: 0; }
 
-.dpip-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+  .item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .item-row:last-of-type { border-bottom: none; }
 
-.dpip-label {
-  font-size: 10px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .item-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 22px;
+    padding-top: 11px;
+    flex-shrink: 0;
+    font-family: var(--mono);
+  }
 
-/* ── CARD ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;
-  padding: 2rem;
-}
+  .item-body { flex: 1; }
 
-/* ── PAGES ── */
-.page { display: none; }
-.page.active { display: block; }
+  .item-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
 
-/* Intro page */
-.intro-title {
-  font-size: 21px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 6px;
-}
+  /* Likert buttons */
+  .likert-scale {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+  }
+  .likert-option { flex: 1; text-align: center; }
+  .likert-option input[type="radio"] { display: none; }
+  .likert-option label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+  }
+  .likert-option input[type="radio"]:checked + label {
+    background: var(--cardinal-dim);
+    border-color: var(--cardinal);
+    color: var(--cardinal);
+  }
+  .likert-option label:hover {
+    background: var(--cardinal-dim);
+    border-color: var(--cardinal);
+    color: var(--cardinal);
+  }
 
-.intro-body {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.65;
-  margin-bottom: 1.5rem;
-}
+  .likert-anchors {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+  .likert-anchor { font-size: 10px; color: var(--text-muted); font-style: italic; }
 
-.scale-key {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 12px 10px;
-  margin-bottom: 1.75rem;
-}
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px 28px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--cardinal); color: #fff; }
+  .btn-primary:hover { background: #7a0000; }
+  .btn-primary:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text-dim); }
+  .btn-outline:hover { border-color: var(--cardinal); color: var(--cardinal); }
+  .btn-lg { padding: 14px 36px; font-size: 15px; }
 
-.scale-key-item { text-align: center; }
+  .btn-row { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; align-items: center; }
+  .btn-note { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
 
-.scale-key-num {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-  display: block;
-  margin-bottom: 3px;
-}
+  /* ── Results ── */
+  .results-header { text-align: center; margin-bottom: 40px; }
+  .results-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .results-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .results-subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
 
-.scale-key-lbl {
-  font-size: 9px;
-  color: var(--muted);
-  line-height: 1.3;
-  display: block;
-}
+  .results-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 32px 0 16px;
+  }
+  .results-section-label:first-of-type { margin-top: 0; }
+  .results-section-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cardinal); flex-shrink: 0; }
+  .results-section-name { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+  .results-section-line { flex: 1; height: 1px; background: var(--border); }
 
-/* Domain page header */
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 1rem;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
-}
+  /* Domain score cards */
+  .domain-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .domain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .domain-card.revealed { opacity: 1; transform: translateY(0); }
+  .domain-card-label { font-size: 10px; font-weight: 700; margin-bottom: 5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .domain-card-val { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .domain-card-denom { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-.page-pip {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+  /* Bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-domain { font-size: 12px; font-weight: 600; color: var(--text); width: 110px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 18px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .bar-fill { height: 100%; background: var(--cardinal); border-radius: 4px; transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1); width: 0%; }
+  .bar-score { font-size: 13px; font-weight: 700; color: var(--cardinal); width: 36px; text-align: right; flex-shrink: 0; }
 
-.page-domain {
-  font-size: 15px;
-  font-weight: 500;
-}
+  /* Finding callout */
+  .results-note {
+    margin-top: 32px;
+    background: #fff8f8;
+    border: 1px solid #e8c0c0;
+    border-left: 4px solid var(--cardinal);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .results-note strong { color: var(--text); font-weight: 600; }
+  .results-note .finding-stat {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--cardinal);
+    margin: 8px 0 12px;
+    font-family: var(--mono);
+  }
 
-.page-tally {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  margin-left: auto;
-}
+  /* Footnotes */
+  .survey-footnotes { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .survey-footnotes ol { list-style: decimal; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .survey-footnotes li { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+  .survey-footnotes li em { font-style: italic; }
+  .survey-footnotes a { color: var(--cardinal); text-decoration: none; }
+  .survey-footnotes a:hover { text-decoration: underline; }
+  .footnote-attribution { margin-top: 14px; font-size: 11px; color: var(--text-muted); font-style: italic; line-height: 1.55; }
+  sup { font-size: 9px; vertical-align: super; color: var(--cardinal); font-weight: 700; }
 
-/* Item rows */
-.item-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 11px 0;
-  border-bottom: 0.5px solid var(--border);
-}
-
-.item-row:last-of-type { border-bottom: none; }
-
-.item-num {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  min-width: 20px;
-  padding-top: 10px;
-  flex-shrink: 0;
-}
-
-.item-body { flex: 1; }
-
-.item-text {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
-
-.btns { display: flex; gap: 4px; flex-wrap: wrap; }
-
-.rb {
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-  flex-shrink: 0;
-}
-.rb:hover { background: var(--border); color: var(--text); }
-.rb.sel { color: #fff; font-weight: 500; border-color: transparent; }
-
-/* Navigation */
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1.75rem;
-  gap: 10px;
-}
-
-.back-btn {
-  font-size: 13px;
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--border);
-  padding: 9px 18px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-family: var(--sans);
-  transition: color 0.1s, border-color 0.1s;
-}
-.back-btn:hover { color: var(--text); border-color: #aaa; }
-.back-btn:disabled { opacity: 0.25; cursor: default; }
-
-.next-btn {
-  padding: 9px 24px;
-  background: var(--red);
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.15s;
-  margin-left: auto;
-}
-.next-btn:hover { opacity: 0.88; }
-.next-btn:disabled { opacity: 0.3; cursor: default; }
-
-.nav-note {
-  font-size: 11px;
-  color: var(--muted);
-  font-family: var(--mono);
-}
-
-/* ── RESULTS ── */
-.r-title {
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 3px;
-}
-
-.r-sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 1.25rem;
-}
-
-.score-cards {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
-  margin-bottom: 1.25rem;
-}
-
-.sc {
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 10px 6px;
-  text-align: center;
-}
-
-.sc-label { font-size: 10px; font-weight: 500; margin-bottom: 3px; }
-.sc-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--text); }
-.sc-denom { font-size: 10px; color: var(--muted); }
-
-.chart-wrap {
-  position: relative;
-  width: 100%;
-  height: 210px;
-  margin-bottom: 1.25rem;
-}
-
-.callout {
-  background: var(--bg);
-  border-left: 3px solid var(--red);
-  border-radius: 0 8px 8px 0;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.callout-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
-.callout-stat { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--red); margin: 6px 0 10px; }
-.callout-body { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 6px; }
-.callout-body:last-child { margin-bottom: 0; }
-.cite { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 10px; }
-
-.retake-btn {
-  font-size: 12px;
-  font-family: var(--mono);
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--border);
-  padding: 7px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
-  transition: color 0.1s, border-color 0.1s;
-}
-.retake-btn:hover { color: var(--red); border-color: var(--red); }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar" id="topbar">
-  <div class="topbar-meta">
-    <span class="topbar-title">Domain-Specific Risk-Taking Scale</span>
-    <span class="topbar-step" id="stepLabel"></span>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    USC Marshall Behavioral Research Lab
+    <span>/ DOSPERT</span>
   </div>
-  <div class="seg-track" id="segTrack"></div>
-  <div class="domain-pips" id="domainPips"></div>
+  <div class="header-right">
+    <span class="phase-label" id="phase-label"></span>
+    <span class="step-counter" id="step-counter"></span>
+  </div>
+</header>
+
+<!-- Segmented progress bar -->
+<div class="progress-segments" id="segment-bar">
+  <div class="segments-track" id="segments-track"></div>
+  <div class="segment-labels" id="segment-labels"></div>
 </div>
 
-<!-- CARD -->
-<div class="card" id="mainCard">
+<!-- MAIN -->
+<main class="page-main">
 
-  <!-- Page 0: Intro -->
-  <div class="page active" id="page-0">
-    <div class="intro-title">Welcome</div>
-    <p class="intro-body">For each situation below, rate how likely you would be to engage in it if you found yourself there. Be honest — there are no right or wrong answers. The pattern across domains is the finding.</p>
-    <p class="intro-body" style="margin-top:-0.75rem">You'll work through five short sections of 6 items each.</p>
-    <div class="scale-key">
-      <div class="scale-key-item"><span class="scale-key-num">1</span><span class="scale-key-lbl">Extremely unlikely</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">2</span><span class="scale-key-lbl">Moderately unlikely</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">3</span><span class="scale-key-lbl">Somewhat unlikely</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">4</span><span class="scale-key-lbl">Not sure</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">5</span><span class="scale-key-lbl">Somewhat likely</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">6</span><span class="scale-key-lbl">Moderately likely</span></div>
-      <div class="scale-key-item"><span class="scale-key-num">7</span><span class="scale-key-lbl">Extremely likely</span></div>
+  <!-- ══ WELCOME ══ -->
+  <div class="screen active" id="screen-welcome">
+
+    <div class="welcome-eyebrow">USC Marshall Behavioral Research Lab &mdash; DOSPERT</div>
+
+    <h1 class="welcome-title">
+      Domain-Specific<br><em>Risk-Taking Scale</em>
+    </h1>
+
+    <p class="welcome-description">
+      For each situation below, rate how likely you would be to engage in it if you found yourself there. Be honest — there are no right or wrong answers. The pattern across domains is the finding.
+    </p>
+
+    <div class="welcome-cards">
+      <div class="welcome-card">
+        <div class="card-num">30</div>
+        <div class="card-label">questions</div>
+        <div class="card-title">Five domains</div>
+        <div class="card-desc">Ethical, Financial, Health/Safety, Recreational, and Social</div>
+      </div>
+      <div class="welcome-card">
+        <div class="card-num">5</div>
+        <div class="card-label">minutes</div>
+        <div class="card-title">7-point scale</div>
+        <div class="card-desc">Extremely Unlikely (1) to Extremely Likely (7)</div>
+      </div>
     </div>
-    <div class="nav">
-      <button class="back-btn" disabled>Back</button>
-      <button class="next-btn" onclick="goTo(1)">Begin &#8594;</button>
-    </div>
+
+    <div class="welcome-divider">approximately 5 minutes</div>
+
+    <button class="btn btn-primary btn-lg" onclick="startSurvey()">
+      Begin Survey &rarr;
+    </button>
+
   </div>
 
-  <!-- Domain pages 1–5 built by JS -->
-  <div id="domainPages"></div>
 
-  <!-- Results page -->
-  <div class="page" id="page-results">
-    <div class="r-title">Your risk profile</div>
-    <div class="r-sub">Domain scores out of 42 &nbsp;(6 items &times; 7-point scale)</div>
-    <div class="score-cards" id="scoreCards"></div>
-    <div class="chart-wrap"><canvas id="dospertChart"></canvas></div>
-    <div class="callout">
-      <div class="callout-title">The finding — from your own data</div>
-      <div class="callout-stat" id="calloutStat"></div>
-      <div class="callout-body" id="calloutBody1"></div>
-      <div class="callout-body">Research using this scale found that within-person variation across domains is roughly <strong>7 times larger</strong> than between-person variation (Blais &amp; Weber, 2006). Your profile demonstrates exactly this: you are not a uniformly risky or cautious person — you are a contextual one.</div>
-      <div class="callout-body">For autonomous vehicle trust, this means operator selection based on general risk tolerance is a weak design strategy. The situation, the system design, and the information environment do most of the work. Trust calibration is a system design problem — not a personnel problem.</div>
-      <div class="cite">Blais, A. R., &amp; Weber, E. U. (2006). A domain-specific risk-taking (DOSPERT) scale for adult populations. <em>Judgment and Decision Making, 1</em>(1), 33–47.</div>
+  <!-- ══ DOMAIN SECTIONS — built by JS ══ -->
+  <div id="domain-screens"></div>
+
+
+  <!-- ══ RESULTS ══ -->
+  <div class="screen" id="screen-results">
+
+    <div class="results-header">
+      <div class="results-eyebrow">&#10003; Complete</div>
+      <h2 class="results-title">Your Risk Profile</h2>
+      <p class="results-subtitle">
+        Domain scores out of 42 &nbsp;(6 items &times; 7-point scale). The pattern across domains — not any single score — is what matters.
+      </p>
     </div>
-    <button class="retake-btn" onclick="reset()">&#8635; Retake</button>
+
+    <div class="results-section-label">
+      <div class="results-section-dot"></div>
+      <div class="results-section-name">Domain Scores</div>
+      <div class="results-section-line"></div>
+    </div>
+
+    <div class="domain-cards" id="domain-cards"></div>
+
+    <div class="results-section-label">
+      <div class="results-section-dot"></div>
+      <div class="results-section-name">Profile</div>
+      <div class="results-section-line"></div>
+    </div>
+
+    <div class="bar-chart" id="bar-chart"></div>
+
+    <div class="results-note" id="results-note">
+      <strong>The finding — from your own data.</strong>
+      <div class="finding-stat" id="finding-stat"></div>
+      <span id="finding-body1"></span>
+      &nbsp;Research using this scale found that within-person variation across domains is roughly <strong>7 times larger</strong> than between-person variation.<sup>1</sup>
+      You are not a uniformly risky or cautious person — you are a contextual one.
+      For autonomous vehicle trust, this means operator selection based on general risk tolerance is a weak design strategy. The situation, the system design, and the information environment do most of the work.
+      <strong>Trust calibration is a system design problem — not a personnel problem.</strong>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="retakeSurvey()">&#8635; Retake Survey</button>
+    </div>
+
+    <div class="survey-footnotes">
+      <ol>
+        <li id="fn1">
+          Blais, A. R., &amp; Weber, E. U. (2006). A domain-specific risk-taking (DOSPERT) scale for adult populations.
+          <em>Judgment and Decision Making, 1</em>(1), 33–47.
+        </li>
+      </ol>
+      <p class="footnote-attribution">
+        Adapted for classroom use by Brian N. Huh, M.S., USC Marshall Behavioral Research Lab.
+        Original instrument: Blais &amp; Weber (2006).
+      </p>
+    </div>
+
   </div>
 
-</div>
+</main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 <script>
-const DOMAINS = [
+
+// ── Data ─────────────────────────────────────────────────────────
+
+var DOMAINS = [
   {
-    key: "ethical",
-    label: "Ethical",
-    color: "#A32D2D",
+    key:   'ethical',
+    label: 'Ethical',
+    color: '#A32D2D',
     items: [
-      "Taking some questionable deductions on your income tax return.",
-      "Having an affair with a married man/woman.",
-      "Passing off somebody else's work as your own.",
-      "Revealing a friend's secret to someone else.",
-      "Leaving your young children alone at home while running an errand.",
-      "Not returning a wallet you found that contains $200."
+      'Taking some questionable deductions on your income tax return.',
+      'Having an affair with a married man/woman.',
+      'Passing off somebody else\'s work as your own.',
+      'Revealing a friend\'s secret to someone else.',
+      'Leaving your young children alone at home while running an errand.',
+      'Not returning a wallet you found that contains $200.'
     ]
   },
   {
-    key: "financial",
-    label: "Financial",
-    color: "#BA7517",
+    key:   'financial',
+    label: 'Financial',
+    color: '#BA7517',
     items: [
-      "Betting a day's income at the horse races.",
-      "Investing 10% of your annual income in a moderate growth diversified fund.",
-      "Betting a day's income at a high-stakes poker game.",
-      "Investing 5% of your annual income in a very speculative stock.",
-      "Betting a day's income on the outcome of a sporting event.",
-      "Investing 10% of your annual income in a new business venture."
+      'Betting a day\'s income at the horse races.',
+      'Investing 10% of your annual income in a moderate growth diversified fund.',
+      'Betting a day\'s income at a high-stakes poker game.',
+      'Investing 5% of your annual income in a very speculative stock.',
+      'Betting a day\'s income on the outcome of a sporting event.',
+      'Investing 10% of your annual income in a new business venture.'
     ]
   },
   {
-    key: "health",
-    label: "Health / Safety",
-    color: "#185FA5",
+    key:   'health',
+    label: 'Health / Safety',
+    color: '#185FA5',
     items: [
-      "Drinking heavily at a social function.",
-      "Engaging in unprotected sex.",
-      "Driving a car without wearing a seat belt.",
-      "Riding a motorcycle without a helmet.",
-      "Sunbathing without sunscreen.",
-      "Walking home alone at night in an unsafe area of town."
+      'Drinking heavily at a social function.',
+      'Engaging in unprotected sex.',
+      'Driving a car without wearing a seat belt.',
+      'Riding a motorcycle without a helmet.',
+      'Sunbathing without sunscreen.',
+      'Walking home alone at night in an unsafe area of town.'
     ]
   },
   {
-    key: "recreational",
-    label: "Recreational",
-    color: "#0F6E56",
+    key:   'recreational',
+    label: 'Recreational',
+    color: '#0F6E56',
     items: [
-      "Going camping in the wilderness.",
-      "Going down a ski run that is beyond your ability.",
-      "Going whitewater rafting at high water in the spring.",
-      "Taking a skydiving class.",
-      "Bungee jumping off a tall bridge.",
-      "Piloting a small plane."
+      'Going camping in the wilderness.',
+      'Going down a ski run that is beyond your ability.',
+      'Going whitewater rafting at high water in the spring.',
+      'Taking a skydiving class.',
+      'Bungee jumping off a tall bridge.',
+      'Piloting a small plane.'
     ]
   },
   {
-    key: "social",
-    label: "Social",
-    color: "#534AB7",
+    key:   'social',
+    label: 'Social',
+    color: '#534AB7',
     items: [
-      "Admitting that your tastes are different from those of a friend.",
-      "Disagreeing with an authority figure on a major issue.",
-      "Choosing a career that you truly enjoy over a more prestigious one.",
-      "Speaking your mind about an unpopular issue in a meeting at work.",
-      "Moving to a city far away from your extended family.",
-      "Starting a new career in your mid-thirties."
+      'Admitting that your tastes are different from those of a friend.',
+      'Disagreeing with an authority figure on a major issue.',
+      'Choosing a career that you truly enjoy over a more prestigious one.',
+      'Speaking your mind about an unpopular issue in a meeting at work.',
+      'Moving to a city far away from your extended family.',
+      'Starting a new career in your mid-thirties.'
     ]
   }
 ];
 
-const resp = {};       // key: "ethical_0" etc.
-let currentPage = 0;   // 0=intro, 1–5=domains, 6=results
-const TOTAL_PAGES = 7; // 0 intro + 5 domains + 1 results
-let chart = null;
+var responses = {};   // e.g. { 'ethical_0': 3, 'financial_2': 7, ... }
 
-// ── BUILD DOM ──────────────────────────────────────────────
+// ── Screen management ────────────────────────────────────────────
 
-function buildDomainPages() {
-  const container = document.getElementById('domainPages');
-  let globalNum = 0;
-
-  DOMAINS.forEach((domain, di) => {
-    const pageNum = di + 1;
-    const page = document.createElement('div');
-    page.className = 'page';
-    page.id = `page-${pageNum}`;
-
-    // Header
-    const header = document.createElement('div');
-    header.className = 'page-header';
-    header.innerHTML = `
-      <div class="page-pip" style="background:${domain.color}"></div>
-      <span class="page-domain" style="color:${domain.color}">${domain.label}</span>
-      <span class="page-tally" id="tally_${domain.key}">0 / 6</span>`;
-    page.appendChild(header);
-
-    // Items
-    domain.items.forEach((text, itemIdx) => {
-      globalNum++;
-      const id = `${domain.key}_${itemIdx}`;
-      const row = document.createElement('div');
-      row.className = 'item-row';
-      row.innerHTML = `
-        <span class="item-num">${globalNum}</span>
-        <div class="item-body">
-          <div class="item-text">${text}</div>
-          <div class="btns">
-            ${[1,2,3,4,5,6,7].map(v =>
-              `<button class="rb" data-id="${id}" data-domain="${domain.key}" data-v="${v}"
-                onclick="pick('${id}','${domain.key}',${v},this)">${v}</button>`
-            ).join('')}
-          </div>
-        </div>`;
-      page.appendChild(row);
-    });
-
-    // Nav
-    const isLast = di === DOMAINS.length - 1;
-    const nav = document.createElement('div');
-    nav.className = 'nav';
-    nav.innerHTML = `
-      <button class="back-btn" onclick="goTo(${pageNum - 1})">&#8592; Back</button>
-      <span class="nav-note" id="note_${domain.key}">Answer all 6 to continue</span>
-      <button class="next-btn" id="next_${domain.key}" onclick="goTo(${isLast ? "'results'" : pageNum + 1})" disabled>
-        ${isLast ? 'See my results' : 'Next &#8594;'}
-      </button>`;
-    page.appendChild(nav);
-
-    container.appendChild(page);
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
   });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
-function buildProgressBar() {
-  // Segmented bar: 5 segments for 5 domain pages
-  const track = document.getElementById('segTrack');
-  track.innerHTML = DOMAINS.map((_, i) =>
-    `<div class="seg" id="seg_${i}"></div>`
-  ).join('');
+// ── Segmented progress bar ───────────────────────────────────────
 
-  // Domain pip row
-  const pips = document.getElementById('domainPips');
-  pips.innerHTML = DOMAINS.map((d, i) =>
-    `<div class="dpip" id="dpip_${i}">
-      <div class="dpip-dot" style="background:${d.color}"></div>
-      <span class="dpip-label" style="color:${d.color}">${d.label}</span>
-    </div>`
-  ).join('');
+function initSegments() {
+  var bar    = document.getElementById('segment-bar');
+  var track  = document.getElementById('segments-track');
+  var labels = document.getElementById('segment-labels');
+  bar.style.display = 'block';
+  track.innerHTML = DOMAINS.map(function(d) {
+    return '<div class="segment" id="seg-' + d.key + '"></div>';
+  }).join('');
+  labels.innerHTML = DOMAINS.map(function(d) {
+    return '<div class="segment-label" id="seglbl-' + d.key + '">' + d.label + '</div>';
+  }).join('');
 }
 
-// ── NAVIGATION ────────────────────────────────────────────
-
-function goTo(target) {
-  const isResults = target === 'results';
-
-  // Hide current
-  document.querySelector('.page.active').classList.remove('active');
-
-  // Show target
-  const targetEl = isResults
-    ? document.getElementById('page-results')
-    : document.getElementById(`page-${target}`);
-  targetEl.classList.add('active');
-
-  currentPage = isResults ? 6 : target;
-  updateProgress();
-
-  if (isResults) renderResults();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function updateProgress() {
-  // step label
-  const stepEl = document.getElementById('stepLabel');
-  if (currentPage === 0) {
-    stepEl.textContent = '';
-  } else if (currentPage === 6) {
-    stepEl.textContent = 'Results';
-  } else {
-    stepEl.textContent = `Section ${currentPage} of 5`;
-  }
-
-  // segments and pips
-  DOMAINS.forEach((_, i) => {
-    const seg  = document.getElementById(`seg_${i}`);
-    const dpip = document.getElementById(`dpip_${i}`);
-    const pageForDomain = i + 1;
-
-    seg.classList.remove('done', 'active');
-    dpip.classList.remove('done', 'active');
-
-    if (currentPage === 6 || pageForDomain < currentPage) {
-      seg.classList.add('done');
-      dpip.classList.add('done');
-    } else if (pageForDomain === currentPage) {
-      seg.classList.add('active');
-      dpip.classList.add('active');
+function setSegment(currentKey) {
+  var reached = false;
+  DOMAINS.forEach(function(d) {
+    var seg = document.getElementById('seg-' + d.key);
+    var lbl = document.getElementById('seglbl-' + d.key);
+    if (d.key === currentKey) {
+      seg.className = 'segment active';
+      lbl.className = 'segment-label active';
+      reached = true;
+    } else if (!reached) {
+      seg.className = 'segment done';
+      lbl.className = 'segment-label';
+    } else {
+      seg.className = 'segment';
+      lbl.className = 'segment-label';
     }
   });
-
-  // Hide topbar on results
-  document.getElementById('topbar').style.opacity = currentPage === 6 ? '0' : '1';
-  document.getElementById('topbar').style.pointerEvents = currentPage === 6 ? 'none' : 'auto';
 }
 
-// ── ITEM INTERACTION ──────────────────────────────────────
+function allSegmentsDone() {
+  DOMAINS.forEach(function(d) {
+    var seg = document.getElementById('seg-' + d.key);
+    var lbl = document.getElementById('seglbl-' + d.key);
+    if (seg) seg.className = 'segment done';
+    if (lbl) lbl.className = 'segment-label';
+  });
+}
 
-function pick(id, domainKey, val, btn) {
-  resp[id] = val;
+// ── Build domain section screens ────────────────────────────────
 
-  // deselect siblings
-  document.querySelectorAll(`[data-id="${id}"]`).forEach(b => {
-    b.classList.remove('sel');
-    b.style.background = '';
-    b.style.borderColor = '';
+function buildDomainScreens() {
+  var container = document.getElementById('domain-screens');
+  var globalNum = 0;
+
+  DOMAINS.forEach(function(domain, di) {
+    var screenId  = 'screen-' + domain.key;
+    var isFirst   = di === 0;
+    var isLast    = di === DOMAINS.length - 1;
+    var prevId    = isFirst  ? 'screen-welcome' : 'screen-' + DOMAINS[di - 1].key;
+    var nextId    = isLast   ? 'screen-results'  : 'screen-' + DOMAINS[di + 1].key;
+
+    var div = document.createElement('div');
+    div.className = 'screen';
+    div.id = screenId;
+
+    // Section header
+    var headerHTML = '<div class="section-header">' +
+      '<span class="section-badge" style="background:' + hexToRgba(domain.color, 0.08) + ';color:' + domain.color + ';border-color:' + hexToRgba(domain.color, 0.2) + '">Section ' + (di + 1) + ' of 5</span>' +
+      '<div>' +
+        '<div class="section-title" style="color:' + domain.color + '">' + domain.label + '</div>' +
+        '<div class="section-subtitle">Rate your likelihood for each activity &mdash; <span id="tally-' + domain.key + '">0 of 6 answered</span></div>' +
+      '</div>' +
+    '</div>';
+
+    // Section body
+    var bodyHTML = '<div class="section-body">' +
+      '<p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.6;">' +
+        'For each situation, rate how likely you would be to engage in it if you found yourself there.' +
+      '</p>';
+
+    domain.items.forEach(function(text, itemIdx) {
+      globalNum++;
+      var name = domain.key + '_' + itemIdx;
+      bodyHTML += '<div class="item-row">' +
+        '<span class="item-num">' + globalNum + '</span>' +
+        '<div class="item-body">' +
+          '<div class="item-text">' + text + '</div>' +
+          '<div class="likert-scale">';
+
+      for (var v = 1; v <= 7; v++) {
+        var id = name + '_' + v;
+        bodyHTML += '<div class="likert-option">' +
+          '<input type="radio" name="' + name + '" id="' + id + '" value="' + v + '" onchange="recordResponse(\'' + domain.key + '\', \'' + name + '\', ' + v + ')">' +
+          '<label for="' + id + '">' + v + '</label>' +
+        '</div>';
+      }
+
+      bodyHTML += '</div>';  // .likert-scale
+      bodyHTML += '<div class="likert-anchors">' +
+        '<span class="likert-anchor">Extremely unlikely</span>' +
+        '<span class="likert-anchor">Extremely likely</span>' +
+      '</div>';
+      bodyHTML += '</div></div>';  // .item-body .item-row
+    });
+
+    // Nav buttons
+    bodyHTML += '<div class="btn-row">' +
+      '<button class="btn btn-outline" onclick="goTo(\'' + prevId + '\', null)">&larr; Back</button>' +
+      '<button class="btn btn-primary" id="next-' + domain.key + '" onclick="tryAdvance(\'' + domain.key + '\', \'' + nextId + '\')" disabled>' +
+        (isLast ? 'See My Results' : 'Next &rarr;') +
+      '</button>' +
+      '<span class="btn-note" id="note-' + domain.key + '">Answer all 6 to continue</span>' +
+    '</div>';
+
+    bodyHTML += '</div>';  // .section-body
+
+    div.innerHTML = headerHTML + bodyHTML;
+    container.appendChild(div);
+  });
+}
+
+// ── Response recording ───────────────────────────────────────────
+
+function recordResponse(domainKey, itemName, val) {
+  responses[itemName] = val;
+
+  // Count answered for this domain
+  var answered = 0;
+  var d = DOMAINS.find(function(d) { return d.key === domainKey; });
+  d.items.forEach(function(_, i) {
+    if (responses[domainKey + '_' + i]) answered++;
   });
 
-  // select
-  const color = DOMAINS.find(d => d.key === domainKey).color;
-  btn.classList.add('sel');
-  btn.style.background = color;
+  // Update tally
+  var tally = document.getElementById('tally-' + domainKey);
+  if (tally) tally.textContent = answered + ' of 6 answered';
 
-  // update tally
-  const answered = Object.keys(resp).filter(k => k.startsWith(domainKey + '_')).length;
-  const tallyEl = document.getElementById('tally_' + domainKey);
-  if (tallyEl) tallyEl.textContent = answered + ' / 6';
-
-  // unlock next button if all 6 answered
-  const nextBtn = document.getElementById('next_' + domainKey);
-  const noteEl  = document.getElementById('note_' + domainKey);
-  if (nextBtn && answered === 6) {
+  // Unlock next button
+  var nextBtn  = document.getElementById('next-' + domainKey);
+  var noteEl   = document.getElementById('note-' + domainKey);
+  if (answered === 6) {
     nextBtn.disabled = false;
-    if (noteEl) noteEl.textContent = '';
+    if (noteEl) noteEl.style.display = 'none';
   }
 }
 
-// ── RESULTS ───────────────────────────────────────────────
+// ── Navigation ───────────────────────────────────────────────────
+
+function goTo(screenId, domainKey) {
+  showScreen(screenId);
+  if (domainKey) {
+    setSegment(domainKey);
+    var idx = DOMAINS.findIndex(function(d) { return d.key === domainKey; });
+    setPhaseLabel(domainKey);
+    setStepCounter((idx + 1) + ' / 5');
+  }
+}
+
+function tryAdvance(domainKey, nextId) {
+  // Verify all 6 answered (belt-and-suspenders)
+  var d = DOMAINS.find(function(d) { return d.key === domainKey; });
+  var ok = d.items.every(function(_, i) { return !!responses[domainKey + '_' + i]; });
+  if (!ok) return;
+
+  if (nextId === 'screen-results') {
+    allSegmentsDone();
+    setPhaseLabel('');
+    setStepCounter('');
+    renderResults();
+    showScreen('screen-results');
+  } else {
+    // Find the next domain key
+    var nextDomain = DOMAINS.find(function(d) { return 'screen-' + d.key === nextId; });
+    goTo(nextId, nextDomain ? nextDomain.key : null);
+  }
+}
+
+// ── Phase label / step counter ───────────────────────────────────
+
+function setPhaseLabel(text) {
+  document.getElementById('phase-label').textContent = text ? text.toUpperCase() : '';
+}
+function setStepCounter(text) {
+  var el = document.getElementById('step-counter');
+  el.textContent = text;
+  el.style.display = text ? 'inline' : 'none';
+}
+
+// ── Survey start ─────────────────────────────────────────────────
+
+function startSurvey() {
+  initSegments();
+  setSegment(DOMAINS[0].key);
+  setPhaseLabel(DOMAINS[0].label);
+  setStepCounter('1 / 5');
+  showScreen('screen-' + DOMAINS[0].key);
+}
+
+// ── Compute scores ───────────────────────────────────────────────
 
 function computeScores() {
-  const scores = {};
-  DOMAINS.forEach(domain => {
-    scores[domain.key] = domain.items.reduce((sum, _, i) =>
-      sum + (resp[`${domain.key}_${i}`] || 0), 0);
+  var scores = {};
+  DOMAINS.forEach(function(d) {
+    var sum = 0;
+    d.items.forEach(function(_, i) { sum += (responses[d.key + '_' + i] || 0); });
+    scores[d.key] = sum;
   });
   return scores;
 }
 
+// ── Render results ───────────────────────────────────────────────
+
 function renderResults() {
-  const scores = computeScores();
-  const vals   = DOMAINS.map(d => scores[d.key]);
-  const mx     = Math.max(...vals);
-  const mn     = Math.min(...vals);
-  const rng    = mx - mn;
-  const hd     = DOMAINS[vals.indexOf(mx)].label;
-  const ld     = DOMAINS[vals.indexOf(mn)].label;
+  var scores = computeScores();
+  var vals   = DOMAINS.map(function(d) { return scores[d.key]; });
+  var mx     = Math.max.apply(null, vals);
+  var mn     = Math.min.apply(null, vals);
+  var rng    = mx - mn;
+  var hdIdx  = vals.indexOf(mx);
+  var ldIdx  = vals.indexOf(mn);
+  var hd     = DOMAINS[hdIdx].label;
+  var ld     = DOMAINS[ldIdx].label;
 
-  document.getElementById('scoreCards').innerHTML = DOMAINS.map((d, i) => `
-    <div class="sc">
-      <div class="sc-label" style="color:${d.color}">${d.label}</div>
-      <div class="sc-val">${vals[i]}</div>
-      <div class="sc-denom">/ 42</div>
-    </div>`).join('');
+  // Domain cards
+  var cardsEl = document.getElementById('domain-cards');
+  cardsEl.innerHTML = DOMAINS.map(function(d, i) {
+    return '<div class="domain-card" id="dc-' + i + '">' +
+      '<div class="domain-card-label" style="color:' + d.color + '">' + d.label + '</div>' +
+      '<div class="domain-card-val">' + vals[i] + '</div>' +
+      '<div class="domain-card-denom">/ 42</div>' +
+    '</div>';
+  }).join('');
 
-  document.getElementById('calloutStat').textContent = rng + '-point spread across your five domains';
-  document.getElementById('calloutBody1').innerHTML =
-    `Your highest domain is <strong>${hd}</strong> (${mx}/42) and your lowest is <strong>${ld}</strong> (${mn}/42). That ${rng}-point within-person range is what matters.`;
-
-  if (chart) chart.destroy();
-  chart = new Chart(document.getElementById('dospertChart'), {
-    type: 'bar',
-    data: {
-      labels: DOMAINS.map(d => d.label),
-      datasets: [{
-        data: vals,
-        backgroundColor: DOMAINS.map(d => d.color + 'BB'),
-        borderColor:     DOMAINS.map(d => d.color),
-        borderWidth: 1,
-        borderRadius: 4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ' Score: ' + c.parsed.y + ' / 42' } }
-      },
-      scales: {
-        y: { min: 6, max: 42, ticks: { font: { size: 11 }, color: '#888', stepSize: 6 }, grid: { color: 'rgba(0,0,0,0.06)' } },
-        x: { ticks: { font: { size: 11 }, color: '#555' }, grid: { display: false } }
-      }
-    }
+  // Animate cards in
+  DOMAINS.forEach(function(_, i) {
+    setTimeout(function() {
+      var card = document.getElementById('dc-' + i);
+      if (card) card.classList.add('revealed');
+    }, i * 80);
   });
+
+  // Bar chart
+  var barEl = document.getElementById('bar-chart');
+  barEl.innerHTML = DOMAINS.map(function(d, i) {
+    var pct = Math.round((vals[i] / 42) * 100);
+    return '<div class="bar-row">' +
+      '<div class="bar-domain">' + d.label + '</div>' +
+      '<div class="bar-track"><div class="bar-fill" id="bar-' + d.key + '" style="background:' + d.color + ';width:0%"></div></div>' +
+      '<div class="bar-score" style="color:' + d.color + '">' + vals[i] + '</div>' +
+    '</div>';
+  }).join('');
+
+  // Animate bars
+  DOMAINS.forEach(function(d, i) {
+    var pct = Math.round((vals[i] / 42) * 100);
+    setTimeout(function() {
+      var bar = document.getElementById('bar-' + d.key);
+      if (bar) bar.style.width = pct + '%';
+    }, 200 + i * 80);
+  });
+
+  // Finding callout
+  document.getElementById('finding-stat').textContent =
+    rng + '-point spread across your five domains';
+  document.getElementById('finding-body1').innerHTML =
+    'Your highest domain is <strong>' + hd + '</strong> (' + mx + '/42) and your lowest is <strong>' + ld + '</strong> (' + mn + '/42). That ' + rng + '-point within-person range is what matters.';
 }
 
-// ── RESET ─────────────────────────────────────────────────
+// ── Retake ───────────────────────────────────────────────────────
 
-function reset() {
-  Object.keys(resp).forEach(k => delete resp[k]);
+function retakeSurvey() {
+  responses = {};
 
-  // clear all button selections
-  document.querySelectorAll('.rb.sel').forEach(b => {
-    b.classList.remove('sel');
-    b.style.background = '';
+  // Uncheck all radios
+  document.querySelectorAll('input[type="radio"]').forEach(function(r) {
+    r.checked = false;
   });
 
-  // reset tallies and next buttons
-  DOMAINS.forEach(d => {
-    const t = document.getElementById('tally_' + d.key);
-    if (t) t.textContent = '0 / 6';
-    const n = document.getElementById('next_' + d.key);
-    if (n) n.disabled = true;
-    const note = document.getElementById('note_' + d.key);
-    if (note) note.textContent = 'Answer all 6 to continue';
+  // Reset tallies and next buttons
+  DOMAINS.forEach(function(d) {
+    var tally = document.getElementById('tally-' + d.key);
+    if (tally) tally.textContent = '0 of 6 answered';
+    var btn = document.getElementById('next-' + d.key);
+    if (btn) btn.disabled = true;
+    var note = document.getElementById('note-' + d.key);
+    if (note) note.style.display = '';
+    var seg = document.getElementById('seg-' + d.key);
+    if (seg) seg.className = 'segment';
+    var lbl = document.getElementById('seglbl-' + d.key);
+    if (lbl) lbl.className = 'segment-label';
   });
 
-  if (chart) { chart.destroy(); chart = null; }
-
-  // go back to intro
-  document.querySelector('.page.active').classList.remove('active');
-  document.getElementById('page-0').classList.add('active');
-  currentPage = 0;
-  updateProgress();
-  document.getElementById('topbar').style.opacity = '1';
-  document.getElementById('topbar').style.pointerEvents = 'auto';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('segment-bar').style.display = 'none';
+  setPhaseLabel('');
+  setStepCounter('');
+  showScreen('screen-welcome');
 }
 
-// ── INIT ──────────────────────────────────────────────────
-buildDomainPages();
-buildProgressBar();
-updateProgress();
+// ── Utility ──────────────────────────────────────────────────────
+
+function hexToRgba(hex, alpha) {
+  var r = parseInt(hex.slice(1, 3), 16);
+  var g = parseInt(hex.slice(3, 5), 16);
+  var b = parseInt(hex.slice(5, 7), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+Array.prototype.findIndex = Array.prototype.findIndex || function(fn) {
+  for (var i = 0; i < this.length; i++) { if (fn(this[i])) return i; }
+  return -1;
+};
+
+// ── Init ─────────────────────────────────────────────────────────
+
+buildDomainScreens();
+
 </script>
 </body>
 </html>
