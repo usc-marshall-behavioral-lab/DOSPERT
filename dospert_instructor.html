@@ -3,487 +3,527 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOSPERT Class Visualizer</title>
+<title>DOSPERT — Instructor Class Visualizer</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --red: #990000;
-  --red-light: #f5e6e6;
-  --ethical: #A32D2D;
-  --financial: #BA7517;
-  --health: #185FA5;
-  --recreational: #0F6E56;
-  --social: #534AB7;
-  --bg: #f7f6f2;
-  --surface: #ffffff;
-  --border: #e4e2d9;
-  --text: #1a1917;
-  --muted: #7a786f;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-}
+  :root {
+    --bg:           #f5f4f2;
+    --surface:      #ffffff;
+    --surface2:     #f0efed;
+    --border:       #dddbd8;
+    --cardinal:     #990000;
+    --cardinal-dim: rgba(153,0,0,0.08);
+    --green:        #2a7a4b;
+    --red:          #c0392b;
+    --text:         #1a1a1a;
+    --text-dim:     #555555;
+    --text-muted:   #888888;
+    --sans:         -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --mono:         'Courier New', Courier, monospace;
+    --radius:       8px;
+    --radius-lg:    12px;
 
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
+    --ethical:      #A32D2D;
+    --financial:    #BA7517;
+    --health:       #185FA5;
+    --recreational: #0F6E56;
+    --social:       #534AB7;
+  }
 
-header {
-  background: var(--red);
-  padding: 1rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.header-left { display: flex; align-items: baseline; gap: 14px; }
+  /* ── Header ── */
+  .site-header {
+    width: 100%;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 3px solid var(--cardinal);
+    background: var(--surface);
+  }
+  .site-header .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cardinal);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .site-header .logo span { color: var(--text-dim); font-weight: 400; }
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-badge {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 700;
+    background: var(--cardinal-dim);
+    color: var(--cardinal);
+    border: 1px solid rgba(153,0,0,0.2);
+  }
+  .student-count {
+    font-size: 12px;
+    color: var(--cardinal);
+    font-weight: 700;
+    font-family: var(--mono);
+  }
 
-.header-title {
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;
-  letter-spacing: 0.01em;
-}
+  /* ── Two-column layout ── */
+  .page-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    width: 100%;
+    min-height: calc(100vh - 59px);
+  }
 
-.header-sub {
-  font-size: 12px;
-  color: rgba(255,255,255,0.65);
-  font-family: var(--mono);
-}
+  /* ── Left panel ── */
+  .entry-panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
 
-.header-count {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: rgba(255,255,255,0.7);
-}
+  .panel-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
 
-.main {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 0;
-  min-height: calc(100vh - 52px);
-}
+  /* Name input */
+  .name-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .name-input:focus { border-color: var(--cardinal); background: var(--surface); }
+  .name-input::placeholder { color: var(--text-muted); }
 
-/* --- LEFT PANEL --- */
-.panel {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+  /* Score fields */
+  .score-fields { display: flex; flex-direction: column; gap: 8px; }
 
-.panel-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.name-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.name-input:focus { border-color: var(--red); }
-.name-input::placeholder { color: var(--muted); }
+  .score-pip {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
 
-.score-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+  .score-domain-label {
+    font-size: 12px;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+  }
 
-.score-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .score-number-input {
+    width: 64px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: center;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    -moz-appearance: textfield;
+  }
+  .score-number-input::-webkit-outer-spin-button,
+  .score-number-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .score-number-input:focus  { border-color: var(--cardinal); background: var(--surface); }
+  .score-number-input.invalid { border-color: var(--red); background: #fdf0f0; }
+  .score-number-input.valid   { border-color: var(--green); }
 
-.score-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+  .score-range-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-.score-domain {
-  font-size: 12px;
-  color: var(--text);
-  flex: 1;
-}
+  /* Add button */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    justify-content: center;
+  }
+  .btn-primary { background: var(--cardinal); color: #fff; width: 100%; }
+  .btn-primary:hover { background: #7a0000; }
+  .btn-primary:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+  .btn-outline {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 6px 14px;
+    width: 100%;
+  }
+  .btn-outline:hover { border-color: var(--cardinal); color: var(--cardinal); }
 
-.score-input {
-  width: 56px;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: var(--mono);
-  font-size: 13px;
-  text-align: center;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.score-input:focus { border-color: var(--red); }
-.score-input.invalid { border-color: #e24b4a; background: #fff5f5; }
+  /* Roster */
+  .roster { flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; min-height: 60px; }
 
-.score-range {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  width: 36px;
-  text-align: right;
-}
+  .roster-empty { font-size: 12px; color: var(--text-muted); padding: 4px 0; }
 
-.add-btn {
-  width: 100%;
-  padding: 10px;
-  background: var(--red);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.add-btn:hover { opacity: 0.88; }
-.add-btn:disabled { opacity: 0.35; cursor: default; }
+  .roster-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    transition: border-color 0.1s;
+  }
+  .roster-item:hover { border-color: var(--border); }
 
-.roster {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  .roster-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.roster-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: var(--bg);
-  border: 1px solid transparent;
-  transition: border-color 0.1s;
-}
-.roster-item:hover { border-color: var(--border); }
+  .roster-scores {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-left: 4px;
+  }
 
-.roster-name {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text);
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .roster-del {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: opacity 0.1s, color 0.1s;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .roster-del:hover { opacity: 1; color: var(--red); }
 
-.roster-scores {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  margin-left: 8px;
-  white-space: nowrap;
-}
+  /* ── Right panel ── */
+  .viz-panel {
+    padding: 28px 28px 60px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 
-.roster-del {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  padding: 2px 4px;
-  border-radius: 3px;
-  margin-left: 6px;
-  opacity: 0.5;
-  transition: opacity 0.1s;
-}
-.roster-del:hover { opacity: 1; color: #e24b4a; }
+  /* Empty state */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+    padding: 60px 0;
+  }
+  .empty-icon { font-size: 32px; opacity: 0.2; margin-bottom: 4px; }
+  .empty-title { font-size: 15px; font-weight: 600; color: var(--text); opacity: 0.35; }
+  .empty-sub   { font-size: 13px; color: var(--text-muted); opacity: 0.5; }
 
-.clear-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--border);
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  transition: color 0.1s, border-color 0.1s;
-}
-.clear-btn:hover { color: #e24b4a; border-color: #e24b4a; }
+  /* Chart cards */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+  }
 
-/* --- RIGHT PANEL --- */
-.viz {
-  padding: 1.75rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow-y: auto;
-}
+  .chart-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
 
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 8px;
-  color: var(--muted);
-}
+  .chart-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
 
-.empty-icon {
-  font-size: 36px;
-  opacity: 0.3;
-  margin-bottom: 4px;
-}
+  .chart-wrap { position: relative; width: 100%; }
 
-.empty-title {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  opacity: 0.4;
-}
+  /* Domain mean stat cards */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+  }
 
-.empty-sub {
-  font-size: 13px;
-  opacity: 0.5;
-}
+  .stat-card {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
 
-.charts-wrap { display: flex; flex-direction: column; gap: 1.5rem; }
+  .stat-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
 
-.chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1.25rem 1.5rem;
-}
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
 
-.chart-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 3px;
-}
+  .stat-denom { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
-.chart-desc {
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 1rem;
-  line-height: 1.5;
-}
+  /* Finding note */
+  .results-note {
+    background: #fff8f8;
+    border: 1px solid #e8c0c0;
+    border-left: 4px solid var(--cardinal);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .results-note strong { color: var(--text); font-weight: 600; }
+  .results-note .finding-stat {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cardinal);
+    margin: 8px 0 10px;
+    font-family: var(--mono);
+  }
 
-.chart-wrap {
-  position: relative;
-  width: 100%;
-}
-
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-}
-
-.stat-card {
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 10px 8px;
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 10px;
-  font-weight: 500;
-  margin-bottom: 4px;
-}
-
-.stat-val {
-  font-family: var(--mono);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.stat-sub {
-  font-size: 10px;
-  color: var(--muted);
-}
-
-.finding-card {
-  background: var(--surface);
-  border-left: 3px solid var(--red);
-  border-radius: 0 10px 10px 0;
-  border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem 1.25rem;
-}
-
-.finding-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
-.finding-stat {
-  font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--red);
-  margin: 6px 0 8px;
-}
-
-.finding-body {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.finding-body + .finding-body { margin-top: 6px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-left">
-    <span class="header-title">DOSPERT Class Visualizer</span>
-    <span class="header-sub">Risk Taking subscale &mdash; instructor view</span>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    USC Marshall Behavioral Research Lab
+    <span>/ DOSPERT — Instructor View</span>
   </div>
-  <span class="header-count" id="headerCount">0 students</span>
+  <div class="header-right">
+    <span class="header-badge">Instructor</span>
+    <span class="student-count" id="studentCount">0 students</span>
+  </div>
 </header>
 
-<div class="main">
+<!-- TWO-COLUMN LAYOUT -->
+<div class="page-layout">
 
   <!-- LEFT: Entry panel -->
-  <div class="panel">
+  <div class="entry-panel">
 
     <div>
-      <div class="panel-label">Student</div>
-      <input class="name-input" id="nameInput" type="text" placeholder="Name or ID (optional)" maxlength="40">
+      <div class="panel-section-label">Student</div>
+      <input class="name-input" id="nameInput" type="text"
+             placeholder="Name or ID (optional)" maxlength="40">
     </div>
 
     <div>
-      <div class="panel-label">Domain scores &nbsp;(6&ndash;42 each)</div>
-      <div class="score-grid">
+      <div class="panel-section-label">Risk-taking domain scores &nbsp;(6–42 each)</div>
+      <div class="score-fields">
         <div class="score-row">
-          <div class="score-dot" style="background:#A32D2D"></div>
-          <span class="score-domain">Ethical</span>
-          <input class="score-input" id="s_ethical" type="number" min="6" max="42" placeholder="—">
-          <span class="score-range">6–42</span>
+          <div class="score-pip" style="background:var(--ethical)"></div>
+          <span class="score-domain-label">Ethical</span>
+          <input class="score-number-input" id="s_ethical"   type="number" min="6" max="42" placeholder="—">
+          <span class="score-range-hint">6–42</span>
         </div>
         <div class="score-row">
-          <div class="score-dot" style="background:#BA7517"></div>
-          <span class="score-domain">Financial</span>
-          <input class="score-input" id="s_financial" type="number" min="6" max="42" placeholder="—">
-          <span class="score-range">6–42</span>
+          <div class="score-pip" style="background:var(--financial)"></div>
+          <span class="score-domain-label">Financial</span>
+          <input class="score-number-input" id="s_financial" type="number" min="6" max="42" placeholder="—">
+          <span class="score-range-hint">6–42</span>
         </div>
         <div class="score-row">
-          <div class="score-dot" style="background:#185FA5"></div>
-          <span class="score-domain">Health / Safety</span>
-          <input class="score-input" id="s_health" type="number" min="6" max="42" placeholder="—">
-          <span class="score-range">6–42</span>
+          <div class="score-pip" style="background:var(--health)"></div>
+          <span class="score-domain-label">Health / Safety</span>
+          <input class="score-number-input" id="s_health"    type="number" min="6" max="42" placeholder="—">
+          <span class="score-range-hint">6–42</span>
         </div>
         <div class="score-row">
-          <div class="score-dot" style="background:#0F6E56"></div>
-          <span class="score-domain">Recreational</span>
-          <input class="score-input" id="s_recreational" type="number" min="6" max="42" placeholder="—">
-          <span class="score-range">6–42</span>
+          <div class="score-pip" style="background:var(--recreational)"></div>
+          <span class="score-domain-label">Recreational</span>
+          <input class="score-number-input" id="s_recreational" type="number" min="6" max="42" placeholder="—">
+          <span class="score-range-hint">6–42</span>
         </div>
         <div class="score-row">
-          <div class="score-dot" style="background:#534AB7"></div>
-          <span class="score-domain">Social</span>
-          <input class="score-input" id="s_social" type="number" min="6" max="42" placeholder="—">
-          <span class="score-range">6–42</span>
+          <div class="score-pip" style="background:var(--social)"></div>
+          <span class="score-domain-label">Social</span>
+          <input class="score-number-input" id="s_social"    type="number" min="6" max="42" placeholder="—">
+          <span class="score-range-hint">6–42</span>
         </div>
       </div>
     </div>
 
-    <button class="add-btn" id="addBtn" onclick="addStudent()">Add student</button>
+    <button class="btn btn-primary" id="addBtn" onclick="addStudent()" disabled>
+      Add Student
+    </button>
 
-    <div>
-      <div class="panel-label">Roster</div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-height:0">
+      <div class="panel-section-label">Roster</div>
       <div class="roster" id="roster">
-        <div style="font-size:12px;color:var(--muted);padding:4px 0">No students yet.</div>
+        <div class="roster-empty">No students yet.</div>
       </div>
     </div>
 
-    <button class="clear-btn" onclick="clearAll()">Clear all</button>
+    <button class="btn btn-outline" onclick="clearAll()">Clear all students</button>
 
   </div>
 
   <!-- RIGHT: Visualization -->
-  <div class="viz" id="viz">
+  <div class="viz-panel" id="vizPanel">
+
     <div class="empty-state" id="emptyState">
       <div class="empty-icon">&#9210;</div>
       <div class="empty-title">No data yet</div>
-      <div class="empty-sub">Add students on the left to see the class profile.</div>
+      <div class="empty-sub">Add students on the left to build the class profile.</div>
     </div>
-    <div class="charts-wrap" id="chartsWrap" style="display:none"></div>
+
+    <div id="chartsWrap" style="display:none;display:flex;flex-direction:column;gap:24px"></div>
+
   </div>
 
 </div>
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const DOMAINS = ["Ethical","Financial","Health/Safety","Recreational","Social"];
-const KEYS    = ["ethical","financial","health","recreational","social"];
-const COLS    = {"Ethical":"#A32D2D","Financial":"#BA7517","Health/Safety":"#185FA5","Recreational":"#0F6E56","Social":"#534AB7"};
-const COLS_T  = {"Ethical":"#A32D2D44","Financial":"#BA751744","Health/Safety":"#185FA544","Recreational":"#0F6E5644","Social":"#534AB744"};
 
-let students = [];
-let profileChart = null;
-let domainChart  = null;
-let counter = 0;
+var DOMAINS = [
+  { key: 'ethical',      label: 'Ethical',       color: '#A32D2D' },
+  { key: 'financial',    label: 'Financial',      color: '#BA7517' },
+  { key: 'health',       label: 'Health/Safety',  color: '#185FA5' },
+  { key: 'recreational', label: 'Recreational',   color: '#0F6E56' },
+  { key: 'social',       label: 'Social',         color: '#534AB7' }
+];
 
-function validate() {
-  let ok = true;
-  KEYS.forEach(k => {
-    const el = document.getElementById('s_' + k);
-    const v = parseInt(el.value, 10);
-    const bad = isNaN(v) || v < 6 || v > 42;
-    el.classList.toggle('invalid', bad);
-    if (bad) ok = false;
-  });
-  return ok;
+var students  = [];
+var counter   = 0;
+var profileChart = null;
+var domainChart  = null;
+
+// ── Validation ───────────────────────────────────────────────────
+
+function getVal(key) {
+  return parseInt(document.getElementById('s_' + key).value, 10);
 }
 
-function addStudent() {
-  if (!validate()) return;
-  counter++;
-  const name = document.getElementById('nameInput').value.trim() || ('Student ' + counter);
-  const scores = {};
-  KEYS.forEach(k => { scores[k] = parseInt(document.getElementById('s_' + k).value, 10); });
-  students.push({ name, scores });
+function isValidScore(v) {
+  return !isNaN(v) && v >= 6 && v <= 42;
+}
 
-  // clear inputs
+function allValid() {
+  return DOMAINS.every(function(d) { return isValidScore(getVal(d.key)); });
+}
+
+function updateAddBtn() {
+  document.getElementById('addBtn').disabled = !allValid();
+}
+
+// Live validation on each input
+DOMAINS.forEach(function(d) {
+  var el = document.getElementById('s_' + d.key);
+  el.addEventListener('input', function() {
+    var v = parseInt(this.value, 10);
+    var empty = this.value === '';
+    this.classList.toggle('invalid', !empty && !isValidScore(v));
+    this.classList.toggle('valid',   !empty &&  isValidScore(v));
+    updateAddBtn();
+  });
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && allValid()) addStudent();
+  });
+});
+
+// ── Add / remove students ────────────────────────────────────────
+
+function addStudent() {
+  if (!allValid()) return;
+  counter++;
+  var name = document.getElementById('nameInput').value.trim() || ('Student ' + counter);
+  var scores = {};
+  DOMAINS.forEach(function(d) { scores[d.key] = getVal(d.key); });
+  students.push({ name: name, scores: scores });
+
+  // Clear inputs
   document.getElementById('nameInput').value = '';
-  KEYS.forEach(k => { document.getElementById('s_' + k).value = ''; document.getElementById('s_' + k).classList.remove('invalid'); });
+  DOMAINS.forEach(function(d) {
+    var el = document.getElementById('s_' + d.key);
+    el.value = '';
+    el.classList.remove('valid', 'invalid');
+  });
+  document.getElementById('addBtn').disabled = true;
   document.getElementById('nameInput').focus();
 
   renderRoster();
@@ -498,124 +538,129 @@ function removeStudent(idx) {
 
 function clearAll() {
   if (students.length === 0) return;
-  if (!confirm('Remove all ' + students.length + ' students?')) return;
+  if (!confirm('Remove all ' + students.length + ' student' + (students.length > 1 ? 's' : '') + '?')) return;
   students = [];
-  counter = 0;
+  counter  = 0;
   renderRoster();
   renderCharts();
 }
 
-function renderRoster() {
-  const el = document.getElementById('roster');
-  document.getElementById('headerCount').textContent = students.length + (students.length === 1 ? ' student' : ' students');
-  if (students.length === 0) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No students yet.</div>';
-    return;
-  }
-  el.innerHTML = students.map((s, i) => {
-    const vals = KEYS.map(k => s.scores[k]);
-    return `<div class="roster-item">
-      <span class="roster-name">${esc(s.name)}</span>
-      <span class="roster-scores">${vals.join(' · ')}</span>
-      <button class="roster-del" onclick="removeStudent(${i})" title="Remove">&#x2715;</button>
-    </div>`;
-  }).join('');
-}
+// ── Roster ───────────────────────────────────────────────────────
 
 function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function renderRoster() {
+  var el = document.getElementById('roster');
+  var n  = students.length;
+  document.getElementById('studentCount').textContent = n + ' student' + (n !== 1 ? 's' : '');
+
+  if (n === 0) {
+    el.innerHTML = '<div class="roster-empty">No students yet.</div>';
+    return;
+  }
+
+  el.innerHTML = students.map(function(s, i) {
+    var vals = DOMAINS.map(function(d) { return s.scores[d.key]; });
+    return '<div class="roster-item">' +
+      '<span class="roster-name">' + esc(s.name) + '</span>' +
+      '<span class="roster-scores">' + vals.join(' &middot; ') + '</span>' +
+      '<button class="roster-del" onclick="removeStudent(' + i + ')" title="Remove">&#x2715;</button>' +
+    '</div>';
+  }).join('');
+}
+
+// ── Charts ───────────────────────────────────────────────────────
+
 function getMeans() {
-  const means = {};
-  DOMAINS.forEach((d, di) => {
-    const k = KEYS[di];
-    means[d] = students.reduce((sum, s) => sum + s.scores[k], 0) / students.length;
+  return DOMAINS.map(function(d) {
+    var sum = students.reduce(function(acc, s) { return acc + s.scores[d.key]; }, 0);
+    return parseFloat((sum / students.length).toFixed(1));
   });
-  return means;
 }
 
-function getWithinPersonVariance() {
-  // Average within-person range across domains
-  const ranges = students.map(s => {
-    const vals = KEYS.map(k => s.scores[k]);
-    return Math.max(...vals) - Math.min(...vals);
+function getAvgWithinRange() {
+  if (students.length === 0) return 0;
+  var ranges = students.map(function(s) {
+    var vals = DOMAINS.map(function(d) { return s.scores[d.key]; });
+    return Math.max.apply(null, vals) - Math.min.apply(null, vals);
   });
-  return ranges.reduce((a, b) => a + b, 0) / ranges.length;
+  return parseFloat((ranges.reduce(function(a, b) { return a + b; }, 0) / ranges.length).toFixed(1));
 }
 
-function getBetweenPersonVariance() {
-  // Average between-person SD across domains
-  const sds = DOMAINS.map((d, di) => {
-    const k = KEYS[di];
-    const vals = students.map(s => s.scores[k]);
-    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const variance = vals.reduce((sum, v) => sum + (v - mean) ** 2, 0) / vals.length;
+function getAvgBetweenSD() {
+  if (students.length < 2) return 0;
+  var sds = DOMAINS.map(function(d) {
+    var vals = students.map(function(s) { return s.scores[d.key]; });
+    var mean = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
+    var variance = vals.reduce(function(sum, v) { return sum + Math.pow(v - mean, 2); }, 0) / vals.length;
     return Math.sqrt(variance);
   });
-  return sds.reduce((a, b) => a + b, 0) / sds.length;
+  return parseFloat((sds.reduce(function(a, b) { return a + b; }, 0) / sds.length).toFixed(1));
 }
 
 function renderCharts() {
-  const wrap = document.getElementById('chartsWrap');
-  const empty = document.getElementById('emptyState');
+  var wrap    = document.getElementById('chartsWrap');
+  var empty   = document.getElementById('emptyState');
 
   if (students.length === 0) {
     empty.style.display = 'flex';
-    wrap.style.display = 'none';
+    wrap.style.display  = 'none';
     if (profileChart) { profileChart.destroy(); profileChart = null; }
     if (domainChart)  { domainChart.destroy();  domainChart  = null; }
+    wrap.innerHTML = '';
     return;
   }
 
   empty.style.display = 'none';
   wrap.style.display  = 'flex';
+  wrap.style.flexDirection = 'column';
+  wrap.style.gap = '24px';
 
-  const means = getMeans();
-  const meanVals = DOMAINS.map(d => parseFloat(means[d].toFixed(1)));
+  var means    = getMeans();
+  var labels   = DOMAINS.map(function(d) { return d.label; });
+  var colors   = DOMAINS.map(function(d) { return d.color; });
 
-  // Build HTML once if not built
+  // Build HTML once
   if (!document.getElementById('profileCanvas')) {
-    wrap.innerHTML = `
-      <div class="chart-card">
-        <div class="chart-title">Individual profiles across domains</div>
-        <div class="chart-desc">Each line is one student. Crossing lines reveal within-person variation — the same person scores very differently across contexts.</div>
-        <div class="chart-wrap" style="height:260px"><canvas id="profileCanvas"></canvas></div>
-      </div>
+    wrap.innerHTML =
+      '<div class="chart-card">' +
+        '<div class="chart-card-title">Individual profiles</div>' +
+        '<div class="chart-card-desc">Each line is one student. Crossing lines show within-person variation — the same person scores very differently across domains. Class mean shown in cardinal.</div>' +
+        '<div class="chart-wrap" style="height:260px"><canvas id="profileCanvas"></canvas></div>' +
+      '</div>' +
 
-      <div class="chart-card">
-        <div class="chart-title">Class domain means</div>
-        <div class="chart-desc">Average score per domain across all students. Spread between bars shows between-domain variation at the group level.</div>
-        <div class="chart-wrap" style="height:180px"><canvas id="domainCanvas"></canvas></div>
-        <div class="stat-row" id="statRow" style="margin-top:1rem"></div>
-      </div>
+      '<div class="chart-card">' +
+        '<div class="chart-card-title">Class domain means</div>' +
+        '<div class="chart-card-desc">Average score per domain across all students.</div>' +
+        '<div class="chart-wrap" style="height:180px"><canvas id="domainCanvas"></canvas></div>' +
+        '<div class="stat-grid" id="statGrid"></div>' +
+      '</div>' +
 
-      <div class="finding-card" id="findingCard"></div>
-    `;
+      '<div class="results-note" id="findingNote"></div>';
   }
 
-  // --- Profile (spaghetti) chart ---
-  const profileDatasets = students.map((s, i) => ({
-    label: s.name,
-    data: KEYS.map(k => s.scores[k]),
-    borderColor: `hsl(${(i * 37) % 360}, 55%, 52%)`,
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    pointRadius: 3,
-    pointHoverRadius: 5,
-    tension: 0.3
-  }));
+  // Profile (spaghetti) chart
+  var profileDatasets = students.map(function(s, i) {
+    return {
+      label: s.name,
+      data:  DOMAINS.map(function(d) { return s.scores[d.key]; }),
+      borderColor: 'hsl(' + ((i * 37) % 360) + ', 50%, 52%)',
+      backgroundColor: 'transparent',
+      borderWidth: 1.5,
+      pointRadius: 3,
+      tension: 0.3
+    };
+  });
 
-  // add mean line
   profileDatasets.push({
     label: 'Class mean',
-    data: meanVals,
+    data:  means,
     borderColor: '#990000',
     backgroundColor: 'transparent',
-    borderWidth: 2.5,
-    pointRadius: 4,
-    pointHoverRadius: 6,
-    borderDash: [],
+    borderWidth: 3,
+    pointRadius: 5,
     tension: 0.3,
     order: -1
   });
@@ -626,35 +671,39 @@ function renderCharts() {
   } else {
     profileChart = new Chart(document.getElementById('profileCanvas'), {
       type: 'line',
-      data: { labels: DOMAINS, datasets: profileDatasets },
+      data: { labels: labels, datasets: profileDatasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: students.length <= 12, position: 'bottom', labels: { font: { size: 10, family: 'DM Mono' }, boxWidth: 10, padding: 8 } },
-          tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y } }
+          legend: {
+            display: students.length <= 15,
+            position: 'bottom',
+            labels: { font: { size: 10, family: 'Courier New' }, boxWidth: 10, padding: 8 }
+          },
+          tooltip: { callbacks: { label: function(c) { return ' ' + c.dataset.label + ': ' + c.parsed.y; } } }
         },
         scales: {
           y: { min: 6, max: 42, ticks: { font: { size: 10 }, color: '#888', stepSize: 6 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-          x: { ticks: { font: { size: 11 }, color: '#555' }, grid: { display: false } }
+          x: { ticks: { font: { size: 11 }, color: '#444' }, grid: { display: false } }
         }
       }
     });
   }
 
-  // --- Domain means bar chart ---
+  // Domain means bar chart
   if (domainChart) {
-    domainChart.data.datasets[0].data = meanVals;
+    domainChart.data.datasets[0].data = means;
     domainChart.update();
   } else {
     domainChart = new Chart(document.getElementById('domainCanvas'), {
       type: 'bar',
       data: {
-        labels: DOMAINS,
+        labels: labels,
         datasets: [{
-          data: meanVals,
-          backgroundColor: DOMAINS.map(d => COLS[d] + 'BB'),
-          borderColor:     DOMAINS.map(d => COLS[d]),
+          data: means,
+          backgroundColor: colors.map(function(c) { return c + 'BB'; }),
+          borderColor:     colors,
           borderWidth: 1,
           borderRadius: 4
         }]
@@ -664,55 +713,53 @@ function renderCharts() {
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: { callbacks: { label: c => ' Mean: ' + c.parsed.y.toFixed(1) + ' / 42' } }
+          tooltip: { callbacks: { label: function(c) { return ' Mean: ' + c.parsed.y.toFixed(1) + ' / 42'; } } }
         },
         scales: {
           y: { min: 6, max: 42, ticks: { font: { size: 10 }, color: '#888', stepSize: 6 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-          x: { ticks: { font: { size: 11 }, color: '#555' }, grid: { display: false } }
+          x: { ticks: { font: { size: 11 }, color: '#444' }, grid: { display: false } }
         }
       }
     });
   }
 
-  // --- Stat cards ---
-  document.getElementById('statRow').innerHTML = DOMAINS.map((d, di) => `
-    <div class="stat-card">
-      <div class="stat-label" style="color:${COLS[d]}">${d}</div>
-      <div class="stat-val">${meanVals[di].toFixed(1)}</div>
-      <div class="stat-sub">/ 42</div>
-    </div>`).join('');
+  // Stat cards
+  var statGrid = document.getElementById('statGrid');
+  if (statGrid) {
+    statGrid.innerHTML = DOMAINS.map(function(d, i) {
+      return '<div class="stat-card">' +
+        '<div class="stat-label" style="color:' + d.color + '">' + d.label + '</div>' +
+        '<div class="stat-val">' + means[i].toFixed(1) + '</div>' +
+        '<div class="stat-denom">/ 42</div>' +
+      '</div>';
+    }).join('');
+  }
 
-  // --- Finding card ---
-  const avgWithin = getWithinPersonVariance();
-  const avgBetween = getBetweenPersonVariance();
-  const ratio = avgBetween > 0 ? (avgWithin / avgBetween).toFixed(1) : '—';
+  // Finding note
+  var avgWithin  = getAvgWithinRange();
+  var avgBetween = getAvgBetweenSD();
+  var maxMeanIdx = means.indexOf(Math.max.apply(null, means));
+  var minMeanIdx = means.indexOf(Math.min.apply(null, means));
+  var classSpread = (Math.max.apply(null, means) - Math.min.apply(null, means)).toFixed(1);
 
-  const maxMeanD = DOMAINS[meanVals.indexOf(Math.max(...meanVals))];
-  const minMeanD = DOMAINS[meanVals.indexOf(Math.min(...meanVals))];
-  const classSpread = (Math.max(...meanVals) - Math.min(...meanVals)).toFixed(1);
-
-  document.getElementById('findingCard').innerHTML = `
-    <div class="finding-title">The finding &mdash; from your class data</div>
-    <div class="finding-stat">Avg. within-person range: ${avgWithin.toFixed(1)} pts &nbsp;|&nbsp; Avg. between-person SD: ${avgBetween.toFixed(1)} pts</div>
-    <div class="finding-body">Highest class mean: <strong>${maxMeanD}</strong>. Lowest: <strong>${minMeanD}</strong>. Group-level domain spread: <strong>${classSpread} points</strong>.</div>
-    <div class="finding-body" style="margin-top:6px">Blais &amp; Weber (2006) found within-person variation is roughly <strong>7&times; larger</strong> than between-person variation. The spaghetti chart above is your evidence: lines cross because the same person carries a different risk profile depending on the domain — and that pattern holds for autonomous systems just as it does for physical risk. Trust calibration is a design problem, not a personnel filter.</div>
-  `;
+  var noteEl = document.getElementById('findingNote');
+  if (noteEl) {
+    noteEl.innerHTML =
+      '<strong>The finding — from your class data.</strong>' +
+      '<div class="finding-stat">' +
+        'Avg. within-person range: ' + avgWithin + ' pts &nbsp;|&nbsp; Avg. between-person SD: ' + avgBetween + ' pts' +
+      '</div>' +
+      '<strong>Highest class mean:</strong> ' + DOMAINS[maxMeanIdx].label + ' &nbsp;&middot;&nbsp; ' +
+      '<strong>Lowest:</strong> ' + DOMAINS[minMeanIdx].label + ' &nbsp;&middot;&nbsp; ' +
+      '<strong>Group domain spread:</strong> ' + classSpread + ' pts.' +
+      '<br><br>' +
+      'Blais &amp; Weber (2006) found within-person variation is roughly <strong>7&times; larger</strong> than between-person variation. ' +
+      'The spaghetti chart above is your evidence: lines cross because the same person carries a different risk profile by domain — ' +
+      'and that pattern holds for autonomous systems just as it does for physical risk. ' +
+      '<strong>Trust calibration is a design problem, not a personnel filter.</strong>';
+  }
 }
 
-// Allow Enter key to add student
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.activeElement !== document.getElementById('nameInput')) {
-    addStudent();
-  }
-});
-
-// Live validation on input
-KEYS.forEach(k => {
-  document.getElementById('s_' + k).addEventListener('input', function() {
-    const v = parseInt(this.value, 10);
-    this.classList.toggle('invalid', this.value !== '' && (isNaN(v) || v < 6 || v > 42));
-  });
-});
 </script>
 </body>
 </html>
