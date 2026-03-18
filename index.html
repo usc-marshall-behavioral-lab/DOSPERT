@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOSPERT — Domain-Specific Risk-Taking Scale</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #990000;
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --border: #e4e2d9;
+  --text: #1a1917;
+  --muted: #7a786f;
+  --ethical: #A32D2D;
+  --financial: #BA7517;
+  --health: #185FA5;
+  --recreational: #0F6E56;
+  --social: #534AB7;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1.5rem;
+}
+
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.topbar-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.topbar-step {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Segmented progress bar */
+.seg-track {
+  display: flex;
+  gap: 4px;
+}
+
+.seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+
+.seg.done { background: var(--red); }
+.seg.active { background: var(--red); opacity: 0.45; }
+
+/* Domain pip row */
+.domain-pips {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.dpip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 0;
+  border-radius: 4px;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+
+.dpip.done, .dpip.active { opacity: 1; }
+
+.dpip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dpip-label {
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Intro page */
+.intro-title {
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.intro-body {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+.scale-key {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 12px 10px;
+  margin-bottom: 1.75rem;
+}
+
+.scale-key-item { text-align: center; }
+
+.scale-key-num {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.scale-key-lbl {
+  font-size: 9px;
+  color: var(--muted);
+  line-height: 1.3;
+  display: block;
+}
+
+/* Domain page header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.page-domain {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.page-tally {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* Item rows */
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.item-row:last-of-type { border-bottom: none; }
+
+.item-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 20px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.item-body { flex: 1; }
+
+.item-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.btns { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.rb {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  flex-shrink: 0;
+}
+.rb:hover { background: var(--border); color: var(--text); }
+.rb.sel { color: #fff; font-weight: 500; border-color: transparent; }
+
+/* Navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.75rem;
+  gap: 10px;
+}
+
+.back-btn {
+  font-size: 13px;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: color 0.1s, border-color 0.1s;
+}
+.back-btn:hover { color: var(--text); border-color: #aaa; }
+.back-btn:disabled { opacity: 0.25; cursor: default; }
+
+.next-btn {
+  padding: 9px 24px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-left: auto;
+}
+.next-btn:hover { opacity: 0.88; }
+.next-btn:disabled { opacity: 0.3; cursor: default; }
+
+.nav-note {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ── RESULTS ── */
+.r-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.r-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.score-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 1.25rem;
+}
+
+.sc {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.sc-label { font-size: 10px; font-weight: 500; margin-bottom: 3px; }
+.sc-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--text); }
+.sc-denom { font-size: 10px; color: var(--muted); }
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  margin-bottom: 1.25rem;
+}
+
+.callout {
+  background: var(--bg);
+  border-left: 3px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.callout-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.callout-stat { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--red); margin: 6px 0 10px; }
+.callout-body { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 6px; }
+.callout-body:last-child { margin-bottom: 0; }
+.cite { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 10px; }
+
+.retake-btn {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: color 0.1s, border-color 0.1s;
+}
+.retake-btn:hover { color: var(--red); border-color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar" id="topbar">
+  <div class="topbar-meta">
+    <span class="topbar-title">Domain-Specific Risk-Taking Scale</span>
+    <span class="topbar-step" id="stepLabel"></span>
+  </div>
+  <div class="seg-track" id="segTrack"></div>
+  <div class="domain-pips" id="domainPips"></div>
+</div>
+
+<!-- CARD -->
+<div class="card" id="mainCard">
+
+  <!-- Page 0: Intro -->
+  <div class="page active" id="page-0">
+    <div class="intro-title">Welcome</div>
+    <p class="intro-body">For each situation below, rate how likely you would be to engage in it if you found yourself there. Be honest — there are no right or wrong answers. The pattern across domains is the finding.</p>
+    <p class="intro-body" style="margin-top:-0.75rem">You'll work through five short sections of 6 items each.</p>
+    <div class="scale-key">
+      <div class="scale-key-item"><span class="scale-key-num">1</span><span class="scale-key-lbl">Extremely unlikely</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">2</span><span class="scale-key-lbl">Moderately unlikely</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">3</span><span class="scale-key-lbl">Somewhat unlikely</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">4</span><span class="scale-key-lbl">Not sure</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">5</span><span class="scale-key-lbl">Somewhat likely</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">6</span><span class="scale-key-lbl">Moderately likely</span></div>
+      <div class="scale-key-item"><span class="scale-key-num">7</span><span class="scale-key-lbl">Extremely likely</span></div>
+    </div>
+    <div class="nav">
+      <button class="back-btn" disabled>Back</button>
+      <button class="next-btn" onclick="goTo(1)">Begin &#8594;</button>
+    </div>
+  </div>
+
+  <!-- Domain pages 1–5 built by JS -->
+  <div id="domainPages"></div>
+
+  <!-- Results page -->
+  <div class="page" id="page-results">
+    <div class="r-title">Your risk profile</div>
+    <div class="r-sub">Domain scores out of 42 &nbsp;(6 items &times; 7-point scale)</div>
+    <div class="score-cards" id="scoreCards"></div>
+    <div class="chart-wrap"><canvas id="dospertChart"></canvas></div>
+    <div class="callout">
+      <div class="callout-title">The finding — from your own data</div>
+      <div class="callout-stat" id="calloutStat"></div>
+      <div class="callout-body" id="calloutBody1"></div>
+      <div class="callout-body">Research using this scale found that within-person variation across domains is roughly <strong>7 times larger</strong> than between-person variation (Blais &amp; Weber, 2006). Your profile demonstrates exactly this: you are not a uniformly risky or cautious person — you are a contextual one.</div>
+      <div class="callout-body">For autonomous vehicle trust, this means operator selection based on general risk tolerance is a weak design strategy. The situation, the system design, and the information environment do most of the work. Trust calibration is a system design problem — not a personnel problem.</div>
+      <div class="cite">Blais, A. R., &amp; Weber, E. U. (2006). A domain-specific risk-taking (DOSPERT) scale for adult populations. <em>Judgment and Decision Making, 1</em>(1), 33–47.</div>
+    </div>
+    <button class="retake-btn" onclick="reset()">&#8635; Retake</button>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DOMAINS = [
+  {
+    key: "ethical",
+    label: "Ethical",
+    color: "#A32D2D",
+    items: [
+      "Taking some questionable deductions on your income tax return.",
+      "Having an affair with a married man/woman.",
+      "Passing off somebody else's work as your own.",
+      "Revealing a friend's secret to someone else.",
+      "Leaving your young children alone at home while running an errand.",
+      "Not returning a wallet you found that contains $200."
+    ]
+  },
+  {
+    key: "financial",
+    label: "Financial",
+    color: "#BA7517",
+    items: [
+      "Betting a day's income at the horse races.",
+      "Investing 10% of your annual income in a moderate growth diversified fund.",
+      "Betting a day's income at a high-stakes poker game.",
+      "Investing 5% of your annual income in a very speculative stock.",
+      "Betting a day's income on the outcome of a sporting event.",
+      "Investing 10% of your annual income in a new business venture."
+    ]
+  },
+  {
+    key: "health",
+    label: "Health / Safety",
+    color: "#185FA5",
+    items: [
+      "Drinking heavily at a social function.",
+      "Engaging in unprotected sex.",
+      "Driving a car without wearing a seat belt.",
+      "Riding a motorcycle without a helmet.",
+      "Sunbathing without sunscreen.",
+      "Walking home alone at night in an unsafe area of town."
+    ]
+  },
+  {
+    key: "recreational",
+    label: "Recreational",
+    color: "#0F6E56",
+    items: [
+      "Going camping in the wilderness.",
+      "Going down a ski run that is beyond your ability.",
+      "Going whitewater rafting at high water in the spring.",
+      "Taking a skydiving class.",
+      "Bungee jumping off a tall bridge.",
+      "Piloting a small plane."
+    ]
+  },
+  {
+    key: "social",
+    label: "Social",
+    color: "#534AB7",
+    items: [
+      "Admitting that your tastes are different from those of a friend.",
+      "Disagreeing with an authority figure on a major issue.",
+      "Choosing a career that you truly enjoy over a more prestigious one.",
+      "Speaking your mind about an unpopular issue in a meeting at work.",
+      "Moving to a city far away from your extended family.",
+      "Starting a new career in your mid-thirties."
+    ]
+  }
+];
+
+const resp = {};       // key: "ethical_0" etc.
+let currentPage = 0;   // 0=intro, 1–5=domains, 6=results
+const TOTAL_PAGES = 7; // 0 intro + 5 domains + 1 results
+let chart = null;
+
+// ── BUILD DOM ──────────────────────────────────────────────
+
+function buildDomainPages() {
+  const container = document.getElementById('domainPages');
+  let globalNum = 0;
+
+  DOMAINS.forEach((domain, di) => {
+    const pageNum = di + 1;
+    const page = document.createElement('div');
+    page.className = 'page';
+    page.id = `page-${pageNum}`;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'page-header';
+    header.innerHTML = `
+      <div class="page-pip" style="background:${domain.color}"></div>
+      <span class="page-domain" style="color:${domain.color}">${domain.label}</span>
+      <span class="page-tally" id="tally_${domain.key}">0 / 6</span>`;
+    page.appendChild(header);
+
+    // Items
+    domain.items.forEach((text, itemIdx) => {
+      globalNum++;
+      const id = `${domain.key}_${itemIdx}`;
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <span class="item-num">${globalNum}</span>
+        <div class="item-body">
+          <div class="item-text">${text}</div>
+          <div class="btns">
+            ${[1,2,3,4,5,6,7].map(v =>
+              `<button class="rb" data-id="${id}" data-domain="${domain.key}" data-v="${v}"
+                onclick="pick('${id}','${domain.key}',${v},this)">${v}</button>`
+            ).join('')}
+          </div>
+        </div>`;
+      page.appendChild(row);
+    });
+
+    // Nav
+    const isLast = di === DOMAINS.length - 1;
+    const nav = document.createElement('div');
+    nav.className = 'nav';
+    nav.innerHTML = `
+      <button class="back-btn" onclick="goTo(${pageNum - 1})">&#8592; Back</button>
+      <span class="nav-note" id="note_${domain.key}">Answer all 6 to continue</span>
+      <button class="next-btn" id="next_${domain.key}" onclick="goTo(${isLast ? "'results'" : pageNum + 1})" disabled>
+        ${isLast ? 'See my results' : 'Next &#8594;'}
+      </button>`;
+    page.appendChild(nav);
+
+    container.appendChild(page);
+  });
+}
+
+function buildProgressBar() {
+  // Segmented bar: 5 segments for 5 domain pages
+  const track = document.getElementById('segTrack');
+  track.innerHTML = DOMAINS.map((_, i) =>
+    `<div class="seg" id="seg_${i}"></div>`
+  ).join('');
+
+  // Domain pip row
+  const pips = document.getElementById('domainPips');
+  pips.innerHTML = DOMAINS.map((d, i) =>
+    `<div class="dpip" id="dpip_${i}">
+      <div class="dpip-dot" style="background:${d.color}"></div>
+      <span class="dpip-label" style="color:${d.color}">${d.label}</span>
+    </div>`
+  ).join('');
+}
+
+// ── NAVIGATION ────────────────────────────────────────────
+
+function goTo(target) {
+  const isResults = target === 'results';
+
+  // Hide current
+  document.querySelector('.page.active').classList.remove('active');
+
+  // Show target
+  const targetEl = isResults
+    ? document.getElementById('page-results')
+    : document.getElementById(`page-${target}`);
+  targetEl.classList.add('active');
+
+  currentPage = isResults ? 6 : target;
+  updateProgress();
+
+  if (isResults) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  // step label
+  const stepEl = document.getElementById('stepLabel');
+  if (currentPage === 0) {
+    stepEl.textContent = '';
+  } else if (currentPage === 6) {
+    stepEl.textContent = 'Results';
+  } else {
+    stepEl.textContent = `Section ${currentPage} of 5`;
+  }
+
+  // segments and pips
+  DOMAINS.forEach((_, i) => {
+    const seg  = document.getElementById(`seg_${i}`);
+    const dpip = document.getElementById(`dpip_${i}`);
+    const pageForDomain = i + 1;
+
+    seg.classList.remove('done', 'active');
+    dpip.classList.remove('done', 'active');
+
+    if (currentPage === 6 || pageForDomain < currentPage) {
+      seg.classList.add('done');
+      dpip.classList.add('done');
+    } else if (pageForDomain === currentPage) {
+      seg.classList.add('active');
+      dpip.classList.add('active');
+    }
+  });
+
+  // Hide topbar on results
+  document.getElementById('topbar').style.opacity = currentPage === 6 ? '0' : '1';
+  document.getElementById('topbar').style.pointerEvents = currentPage === 6 ? 'none' : 'auto';
+}
+
+// ── ITEM INTERACTION ──────────────────────────────────────
+
+function pick(id, domainKey, val, btn) {
+  resp[id] = val;
+
+  // deselect siblings
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(b => {
+    b.classList.remove('sel');
+    b.style.background = '';
+    b.style.borderColor = '';
+  });
+
+  // select
+  const color = DOMAINS.find(d => d.key === domainKey).color;
+  btn.classList.add('sel');
+  btn.style.background = color;
+
+  // update tally
+  const answered = Object.keys(resp).filter(k => k.startsWith(domainKey + '_')).length;
+  const tallyEl = document.getElementById('tally_' + domainKey);
+  if (tallyEl) tallyEl.textContent = answered + ' / 6';
+
+  // unlock next button if all 6 answered
+  const nextBtn = document.getElementById('next_' + domainKey);
+  const noteEl  = document.getElementById('note_' + domainKey);
+  if (nextBtn && answered === 6) {
+    nextBtn.disabled = false;
+    if (noteEl) noteEl.textContent = '';
+  }
+}
+
+// ── RESULTS ───────────────────────────────────────────────
+
+function computeScores() {
+  const scores = {};
+  DOMAINS.forEach(domain => {
+    scores[domain.key] = domain.items.reduce((sum, _, i) =>
+      sum + (resp[`${domain.key}_${i}`] || 0), 0);
+  });
+  return scores;
+}
+
+function renderResults() {
+  const scores = computeScores();
+  const vals   = DOMAINS.map(d => scores[d.key]);
+  const mx     = Math.max(...vals);
+  const mn     = Math.min(...vals);
+  const rng    = mx - mn;
+  const hd     = DOMAINS[vals.indexOf(mx)].label;
+  const ld     = DOMAINS[vals.indexOf(mn)].label;
+
+  document.getElementById('scoreCards').innerHTML = DOMAINS.map((d, i) => `
+    <div class="sc">
+      <div class="sc-label" style="color:${d.color}">${d.label}</div>
+      <div class="sc-val">${vals[i]}</div>
+      <div class="sc-denom">/ 42</div>
+    </div>`).join('');
+
+  document.getElementById('calloutStat').textContent = rng + '-point spread across your five domains';
+  document.getElementById('calloutBody1').innerHTML =
+    `Your highest domain is <strong>${hd}</strong> (${mx}/42) and your lowest is <strong>${ld}</strong> (${mn}/42). That ${rng}-point within-person range is what matters.`;
+
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('dospertChart'), {
+    type: 'bar',
+    data: {
+      labels: DOMAINS.map(d => d.label),
+      datasets: [{
+        data: vals,
+        backgroundColor: DOMAINS.map(d => d.color + 'BB'),
+        borderColor:     DOMAINS.map(d => d.color),
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ' Score: ' + c.parsed.y + ' / 42' } }
+      },
+      scales: {
+        y: { min: 6, max: 42, ticks: { font: { size: 11 }, color: '#888', stepSize: 6 }, grid: { color: 'rgba(0,0,0,0.06)' } },
+        x: { ticks: { font: { size: 11 }, color: '#555' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── RESET ─────────────────────────────────────────────────
+
+function reset() {
+  Object.keys(resp).forEach(k => delete resp[k]);
+
+  // clear all button selections
+  document.querySelectorAll('.rb.sel').forEach(b => {
+    b.classList.remove('sel');
+    b.style.background = '';
+  });
+
+  // reset tallies and next buttons
+  DOMAINS.forEach(d => {
+    const t = document.getElementById('tally_' + d.key);
+    if (t) t.textContent = '0 / 6';
+    const n = document.getElementById('next_' + d.key);
+    if (n) n.disabled = true;
+    const note = document.getElementById('note_' + d.key);
+    if (note) note.textContent = 'Answer all 6 to continue';
+  });
+
+  if (chart) { chart.destroy(); chart = null; }
+
+  // go back to intro
+  document.querySelector('.page.active').classList.remove('active');
+  document.getElementById('page-0').classList.add('active');
+  currentPage = 0;
+  updateProgress();
+  document.getElementById('topbar').style.opacity = '1';
+  document.getElementById('topbar').style.pointerEvents = 'auto';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildDomainPages();
+buildProgressBar();
+updateProgress();
+</script>
+</body>
+</html>
